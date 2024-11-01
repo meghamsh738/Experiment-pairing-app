@@ -200,8 +200,7 @@ Please ensure that your contributions adhere to the project's coding standards a
 For any questions, suggestions, or support, please contact:
 
 - **Developer**: Meghamsh Teja Konda
-- **Email**: [your.email@example.com](mailto:your.email@example.com)
-- **Website**: [www.example.com](https://www.example.com) *(Replace with actual website if available)*
+- **Email**: [your.email@example.com](mailto:meghamshteja5552gmail.com)
 
 ---
 
