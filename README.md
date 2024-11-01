@@ -56,7 +56,7 @@ You have two options to install the **Animal Pairing and Grouping Tool™**:
 #### Using the Installer
 
 1. **Download the Installer**:
-   - [[Download Link](#) ](https://drive.google.com/file/d/1bxf9U6xB72cP1yPz_ndedaZlmfJQxVVA/view?usp=sharing)
+   - [[Download Link](https://drive.google.com/file/d/1bxf9U6xB72cP1yPz_ndedaZlmfJQxVVA/view?usp=sharing)
 
 2. **Run the Installer**:
    - Double-click the downloaded installer file.
