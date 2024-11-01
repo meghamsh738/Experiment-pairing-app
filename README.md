@@ -177,6 +177,14 @@ If you encounter issues while using the application, consider the following step
 5. **Contact Support**:
    - If you're unable to resolve the issue, reach out via the contact information below.
 
+
+**Pairing example - In cases of multiple genotypes**:
+![image](https://github.com/user-attachments/assets/63c9e5dc-a3d4-4a0a-9f01-4ef1e868ff85)
+![image](https://github.com/user-attachments/assets/695b541e-dcb8-4efd-8e24-f1e891f75526)
+![image](https://github.com/user-attachments/assets/28478294-1556-4eb2-9e20-faeaa6fc3384)
+
+
+
 ## Contributing
 
 Contributions are welcome! If you'd like to enhance the **Animal Pairing and Grouping Tool™**, please follow these steps:
