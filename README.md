@@ -178,11 +178,18 @@ If you encounter issues while using the application, consider the following step
    - If you're unable to resolve the issue, reach out via the contact information below.
 
 
-**Pairing example - In cases of multiple genotypes**:
-![image](https://github.com/user-attachments/assets/63c9e5dc-a3d4-4a0a-9f01-4ef1e868ff85)
-![image](https://github.com/user-attachments/assets/695b541e-dcb8-4efd-8e24-f1e891f75526)
-![image](https://github.com/user-attachments/assets/28478294-1556-4eb2-9e20-faeaa6fc3384)
+**Pairing example - In cases of single genotype**:
+![image](https://github.com/user-attachments/assets/ab84cde6-a83a-4dc4-92e8-1f0acd46336c)
+![image](https://github.com/user-attachments/assets/ffe74a21-e6c6-4d3c-99fe-ddb6e4dd077b)
+![image](https://github.com/user-attachments/assets/916a7901-d20b-400c-9664-29cb87a1e6b4)
+![image](https://github.com/user-attachments/assets/2fb9bed8-3d74-442c-bf81-d1d8886a96a2)
 
+**Pairing example - In cases of multiple genotype**:
+![image](https://github.com/user-attachments/assets/e3e44b43-56a6-4c5f-86a2-7e5f5f945b93)
+![image](https://github.com/user-attachments/assets/28da2cde-68ef-4b93-80c4-91eb7d7d9c45)
+![image](https://github.com/user-attachments/assets/9cdca6d4-402f-423d-842b-2afd378f611b)
+![image](https://github.com/user-attachments/assets/8485e7bf-eba7-4442-8813-aa24805b58a1)
+![image](https://github.com/user-attachments/assets/d23d3a19-880b-45d6-b9ec-27d25ffdc1d7)
 
 
 ## Contributing
