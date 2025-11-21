@@ -41,6 +41,12 @@
 - **Logging**: Maintains detailed logs of operations and errors to assist in troubleshooting.
 - **About Dialog**: Offers information about the application, including version and developer details.
 
+## Screenshot
+
+Example run using the built-in sample dataset and default grouping settings:
+
+![Animal Pairing and Grouping Tool™ app screenshot](modern-app/screenshots/example_run.png)
+
 ## Getting Started
 
 ### System Requirements
