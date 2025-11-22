@@ -4,9 +4,14 @@
 
 ![Animal Pairing and Grouping Tool™ Logo](assets/app_icon.ico)
 
+This repository now contains two implementations of the same scheduling logic:
+- **Modern web app (preferred):** React + FastAPI in `modern-app/`, with Playwright E2E that drives the example data and regenerates a screenshot.
+- **Legacy desktop app (archived):** The original Python GUI (run `python main.py`) kept for reference.
+
 ## Table of Contents
 - [Overview](#overview)
 - [Features](#features)
+- [Modern Web App (Preferred)](#modern-web-app-preferred)
 - [Getting Started](#getting-started)
   - [System Requirements](#system-requirements)
   - [Installation](#installation)
@@ -43,16 +48,30 @@
 
 ## Screenshot
 
-Example run using the built-in sample dataset and default grouping settings:
+Modern web app using the built-in example dataset and default grouping settings (captured by Playwright E2E):
 
 ![Animal Pairing and Grouping Tool™ app screenshot](modern-app/screenshots/example_run.png)
+
+Recent verification:
+- `npm run test:e2e` (from `modern-app/`) starts the FastAPI backend on :8001 and Vite frontend on :5173, drives the example flow, and regenerates the screenshot above.
+
+## Modern Web App (Preferred)
+- See `modern-app/README.md` for setup, dev commands, and API reference.
+- Quick start:
+  ```bash
+  cd modern-app
+  npm install
+  pip install -r backend/requirements.txt
+  npm run dev:back   # :8001
+  npm run dev:front  # :5173
+  ```
+- To verify and refresh the screenshot: `npm run test:e2e`.
 
 ## Getting Started
 
 ### System Requirements
-
-- **Operating System**: Windows 10 or later (installer available). Python can also run on macOS and Linux if running from source.
-- **Python**: Version 3.7 or higher (only required if running from source).
+- **Operating System**: Windows 10 or later (installer available). Python can also run on macOS and Linux if running the legacy app from source.
+- **Python**: Version 3.7 or higher (only required if running the legacy app).
 - **Dependencies**: Listed below.
 
 ### Installation
