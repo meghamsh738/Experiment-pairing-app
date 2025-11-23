@@ -4,9 +4,7 @@
 
 ![Animal Pairing and Grouping Tool™ Logo](assets/app_icon.ico)
 
-This repository now contains two implementations of the same scheduling logic:
-- **Modern web app (preferred):** React + FastAPI in `modern-app/`, with Playwright E2E that drives the example data and regenerates a screenshot.
-- **Legacy desktop app (archived):** The original Python GUI (run `python main.py`) kept for reference.
+Modern React + FastAPI app (see `modern-app/`). Legacy desktop (Python GUI) is documented in `LEGACY.md`.
 
 ## Table of Contents
 - [Overview](#overview)
