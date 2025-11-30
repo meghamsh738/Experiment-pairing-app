@@ -296,6 +296,20 @@ function App() {
               <div className="text-xs text-gray-500">
                 Parsed animals: {filteredAnimals.length} | Genotypes: {genotypeOptions.join(', ') || 'None'}
               </div>
+              <div className="p-4 rounded-xl bg-blue-50 border border-blue-100 text-blue-900 space-y-2">
+                <div className="flex items-center justify-between gap-3 flex-wrap">
+                  <div>
+                    <p className="text-xs font-semibold">Need to reformat your sheet?</p>
+                    <p className="text-xs">Paste this prompt into ChatGPT, Gemini, or Grok, then use the returned CSV.</p>
+                  </div>
+                  <div className="flex gap-2 text-xs font-semibold underline">
+                    <a href="https://chat.openai.com/" target="_blank" rel="noreferrer" className="text-blue-800">ChatGPT</a>
+                    <a href="https://gemini.google.com/app" target="_blank" rel="noreferrer" className="text-blue-800">Gemini</a>
+                    <a href="https://grok.com/" target="_blank" rel="noreferrer" className="text-blue-800">Grok</a>
+                  </div>
+                </div>
+                <pre className="text-[11px] leading-5 bg-white border border-blue-100 rounded-lg p-3 whitespace-pre-wrap">Convert to CSV with headers: Animal_ID, Genotype, Sex, Age. Normalize Sex to Male/Female, Age in weeks (number). If DOB exists, compute Age in weeks using today&apos;s date. Keep all rows, no invented data. Output CSV only.</pre>
+              </div>
             </div>
 
             <div className="space-y-4">
