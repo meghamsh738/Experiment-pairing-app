@@ -33,6 +33,13 @@ npm run dev:front
 ```
 Open http://localhost:5173 and toggle **Use Example Data** (or upload CSV/XLSX) to preload the sample animals.
 
+## Data format & quick AI helper
+- Required columns (CSV/XLSX): `Animal_ID, Genotype, Sex, Age` (see `example_data/animals.csv`).
+- If your sheet has different headers/order, ask an AI to reshape it first. Handy links: [ChatGPT](https://chat.openai.com/), [Gemini](https://gemini.google.com/app), [Grok](https://grok.com/).
+- Prompt to paste into any of them:
+  - "Convert my table to CSV with headers: Animal_ID,Genotype,Sex,Age. Keep rows as-is, don’t invent data, output UTF-8 CSV text only."
+- After conversion, save as `animals.csv` and upload or paste into the app. Screenshot helper: `screenshots/data-format-helper.svg`.
+
 ## Tests and screenshot
 ```bash
 # Install browsers once
