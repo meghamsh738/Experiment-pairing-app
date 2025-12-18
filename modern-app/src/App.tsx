@@ -212,65 +212,67 @@ function App() {
     }
   }
 
+  const hasResults = groups.length > 0 || pairs.length > 0
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
-        <header className="text-center mb-12">
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-4">
-            Experiment Pairing App
-          </h1>
-          <p className="text-gray-600 text-lg">Upload or paste animals, select genotypes, distribute or pair, and export.</p>
+    <div className="ui-container">
+      <div className="ui-stack">
+        <header className="ui-header">
+          <h1 className="ui-title">Experiment Pairing App</h1>
+          <p className="ui-subtitle">Upload or paste animals, select genotypes, distribute into groups or pair, and export.</p>
         </header>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
-            <strong>Error:</strong> {error}
-            <button onClick={() => setError(null)} className="ml-4 text-red-900 underline">Dismiss</button>
+          <div className="ui-alert error">
+            <div>
+              <strong>Error:</strong> {error}
+            </div>
+            <button onClick={() => setError(null)} className="ui-btn ghost compact">Dismiss</button>
           </div>
         )}
 
-        <div className="grid lg:grid-cols-2 gap-8 items-start">
-          <div className="bg-white rounded-2xl shadow-xl p-8 space-y-6">
-            <div className="flex gap-4">
-              <button
-                onClick={() => setMode('distribute')}
-                data-testid="mode-distribute"
-                className={`flex-1 py-2 px-4 rounded-lg font-semibold transition-all ${mode === 'distribute' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
-              >
-                Distribute into Groups
-              </button>
-              <button
-                onClick={() => setMode('pair')}
-                data-testid="mode-pair"
-                className={`flex-1 py-2 px-4 rounded-lg font-semibold transition-all ${mode === 'pair' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
-              >
-                Pair Animals
-              </button>
+        <section className="ui-panel">
+          <div className="ui-stack sm">
+            <div className="ui-row">
+              <div className="ui-field">
+                <div className="ui-label">Mode</div>
+                <div className="ui-hint">Choose whether you want groups or breeding pairs.</div>
+              </div>
+              <div className="flex w-full gap-2 sm:w-auto">
+                <button
+                  onClick={() => setMode('distribute')}
+                  data-testid="mode-distribute"
+                  className={`ui-btn ${mode === 'distribute' ? 'primary' : 'secondary'} flex-1 sm:flex-none`}
+                >
+                  Distribute into Groups
+                </button>
+                <button
+                  onClick={() => setMode('pair')}
+                  data-testid="mode-pair"
+                  className={`ui-btn ${mode === 'pair' ? 'primary' : 'secondary'} flex-1 sm:flex-none`}
+                >
+                  Pair Animals
+                </button>
+              </div>
             </div>
 
-            <div className="space-y-3">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="ui-field">
+              <div className="ui-row">
                 <div>
-                  <p className="text-sm font-semibold text-gray-700">Data Source</p>
-                  <p className="text-xs text-gray-500">Upload CSV/XLSX or paste data</p>
+                  <div className="ui-label">Data Source</div>
+                  <div className="ui-hint">Upload CSV/XLSX or paste rows (Animal_ID, Genotype, Sex, Age).</div>
                 </div>
-                <div className="flex flex-wrap gap-3 items-center">
-                  <label className="inline-flex items-center gap-2 text-sm font-semibold text-gray-700">
+                <div className="flex flex-wrap items-center gap-2">
+                  <label className="flex items-center gap-2 text-sm">
                     <input
                       type="checkbox"
-                      className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                       checked={useExampleData}
                       onChange={(e) => setUseExampleData(e.target.checked)}
                     />
-                    Use Example Data
+                    <span>Use Example Data</span>
                   </label>
-                  <button
-                    onClick={() => setUseExampleData(true)}
-                    className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-1 rounded transition-colors"
-                  >
-                    Reload Sample
-                  </button>
-                  <label className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-1 rounded cursor-pointer">
+                  <button onClick={() => setUseExampleData(true)} className="ui-btn ghost compact">Reload Sample</button>
+                  <label className="ui-btn ghost compact">
                     Upload File
                     <input
                       type="file"
@@ -284,8 +286,9 @@ function App() {
                   </label>
                 </div>
               </div>
+
               <textarea
-                className="w-full h-40 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm resize-none"
+                className="ui-textarea mono"
                 placeholder="Animal_ID,Genotype,Sex,Age"
                 value={useExampleData ? EXAMPLE_DATA : animalText}
                 onChange={(e) => {
@@ -293,61 +296,73 @@ function App() {
                   setAnimalText(e.target.value)
                 }}
               />
-              <div className="text-xs text-gray-500">
-                Parsed animals: {filteredAnimals.length} | Genotypes: {genotypeOptions.join(', ') || 'None'}
-              </div>
-              <div className="p-4 rounded-xl bg-blue-50 border border-blue-100 text-blue-900 space-y-2">
-                <div className="flex items-center justify-between gap-3 flex-wrap">
-                  <div>
-                    <p className="text-xs font-semibold">Need to reformat your sheet?</p>
-                    <p className="text-xs">Paste this prompt into ChatGPT, Gemini, or Grok, then use the returned CSV.</p>
-                  </div>
-                  <div className="flex gap-2 text-xs font-semibold underline">
-                    <a href="https://chat.openai.com/" target="_blank" rel="noreferrer" className="text-blue-800">ChatGPT</a>
-                    <a href="https://gemini.google.com/app" target="_blank" rel="noreferrer" className="text-blue-800">Gemini</a>
-                    <a href="https://grok.com/" target="_blank" rel="noreferrer" className="text-blue-800">Grok</a>
-                  </div>
-                </div>
-                <pre className="text-[11px] leading-5 bg-white border border-blue-100 rounded-lg p-3 whitespace-pre-wrap">Convert to CSV with headers: Animal_ID, Genotype, Sex, Age. Normalize Sex to Male/Female, Age in weeks (number). If DOB exists, compute Age in weeks using today&apos;s date. Keep all rows, no invented data. Output CSV only.</pre>
+              <div className="ui-hint">
+                Parsed animals: {filteredAnimals.length} · Genotypes: {genotypeOptions.join(', ') || 'None'}
               </div>
             </div>
 
-            <div className="space-y-4">
-              <div>
-                <p className="text-sm font-semibold text-gray-700 mb-2">Genotype Selection</p>
-                <div className="flex flex-wrap gap-2">
-                  {genotypeOptions.map(g => (
-                    <label key={g} className="flex items-center gap-2 text-sm bg-gray-100 px-3 py-1 rounded">
-                      <input
-                        type="checkbox"
-                        checked={selectedGenotypes.includes(g)}
-                        onChange={(e) => {
-                          setSelectedGenotypes(prev => e.target.checked ? [...prev, g] : prev.filter(x => x !== g))
-                        }}
-                      />
-                      {g}
-                    </label>
-                  ))}
-                  {genotypeOptions.length === 0 && <span className="text-xs text-gray-500">No genotypes detected</span>}
+            <div className="ui-panel compact">
+              <div className="ui-row">
+                <div>
+                  <div className="ui-label">Need to reformat your sheet?</div>
+                  <div className="ui-hint">Paste this prompt into ChatGPT, Gemini, or Grok; paste the returned CSV here.</div>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <a href="https://chat.openai.com/" target="_blank" rel="noreferrer" className="ui-btn ghost compact">ChatGPT</a>
+                  <a href="https://gemini.google.com/app" target="_blank" rel="noreferrer" className="ui-btn ghost compact">Gemini</a>
+                  <a href="https://grok.com/" target="_blank" rel="noreferrer" className="ui-btn ghost compact">Grok</a>
                 </div>
               </div>
+              <pre className="ui-codeblock">Convert to CSV with headers: Animal_ID, Genotype, Sex, Age. Normalize Sex to Male/Female, Age in weeks (number). If DOB exists, compute Age in weeks using today&apos;s date. Keep all rows, no invented data. Output CSV only.</pre>
+            </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                {mode === 'distribute' && (
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Number of Groups</label>
+            <div className="ui-field">
+              <div className="ui-row">
+                <div>
+                  <div className="ui-label">Genotype Selection</div>
+                  <div className="ui-hint">Only selected genotypes are included in pairing/grouping.</div>
+                </div>
+                {genotypeOptions.length > 0 && (
+                  <button className="ui-btn ghost compact" onClick={() => setSelectedGenotypes(genotypeOptions)}>
+                    Select all
+                  </button>
+                )}
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {genotypeOptions.map(g => (
+                  <label key={g} className="ui-pill">
                     <input
-                      type="number"
-                      min="1"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      value={numGroups}
-                      onChange={(e) => setNumGroups(parseInt(e.target.value) || 1)}
+                      type="checkbox"
+                      checked={selectedGenotypes.includes(g)}
+                      onChange={(e) => {
+                        setSelectedGenotypes(prev => e.target.checked ? [...prev, g] : prev.filter(x => x !== g))
+                      }}
                     />
-                    <div className="mt-2 space-y-1 text-xs text-gray-600">
+                    {g}
+                  </label>
+                ))}
+                {genotypeOptions.length === 0 && <span className="ui-hint">No genotypes detected</span>}
+              </div>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              {mode === 'distribute' && (
+                <div className="ui-field">
+                  <div className="ui-label">Number of Groups</div>
+                  <input
+                    type="number"
+                    min="1"
+                    className="ui-input"
+                    value={numGroups}
+                    onChange={(e) => setNumGroups(parseInt(e.target.value) || 1)}
+                  />
+                  <div className="ui-field">
+                    <div className="ui-hint">Group names (optional)</div>
+                    <div className="grid gap-2">
                       {groupNames.map((name, idx) => (
                         <input
                           key={idx}
-                          className="w-full px-2 py-1 border border-gray-200 rounded"
+                          className="ui-input compact"
                           value={name}
                           onChange={(e) => {
                             const copy = [...groupNames]
@@ -359,133 +374,135 @@ function App() {
                       ))}
                     </div>
                   </div>
-                )}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Age Leeway (days)</label>
-                  <input
-                    type="number"
-                    min="0"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    value={ageLeeway}
-                    onChange={(e) => setAgeLeeway(parseInt(e.target.value) || 0)}
-                  />
                 </div>
+              )}
+
+              <div className="ui-field">
+                <div className="ui-label">Age Leeway (days)</div>
+                <input
+                  type="number"
+                  min="0"
+                  className="ui-input"
+                  value={ageLeeway}
+                  onChange={(e) => setAgeLeeway(parseInt(e.target.value) || 0)}
+                />
               </div>
             </div>
 
-            <div className="space-y-3">
+            <div className="grid gap-2">
               <button
                 onClick={mode === 'distribute' ? handleDistribute : handlePair}
                 disabled={loading}
                 data-testid="process-btn"
-                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold py-3 px-6 rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                className="ui-btn primary w-full"
               >
-                {loading ? 'Processing...' : mode === 'distribute' ? 'Distribute Animals' : 'Pair Animals'}
+                {loading ? 'Processing…' : mode === 'distribute' ? 'Distribute Animals' : 'Pair Animals'}
               </button>
-              {(groups.length > 0 || pairs.length > 0) && (
-                <button
-                  onClick={handleExport}
-                  className="w-full bg-green-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-green-700 transition-all duration-200 shadow-lg hover:shadow-xl"
-                >
+              {hasResults && (
+                <button onClick={handleExport} className="ui-btn secondary w-full">
                   Export to Excel
                 </button>
               )}
             </div>
           </div>
+        </section>
 
-          <div className="bg-white rounded-2xl shadow-xl p-8 space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-800">Results & Summary</h2>
-              {summary && <span className="text-xs text-gray-500 max-w-md text-right">{summary}</span>}
-            </div>
-
-            {groups.length > 0 && (
-              <div className="space-y-4">
-                {groups.map((group) => (
-                  <div key={group.group_number} className="border border-gray-200 rounded-lg p-4">
-                    <h3 className="font-bold text-lg text-blue-600 mb-2">
-                      {group.group_name || `Group ${group.group_number}`} ({group.count} animals)
-                    </h3>
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-sm">
-                        <thead>
-                          <tr className="bg-gray-50">
-                            <th className="px-3 py-2 text-left">ID</th>
-                            <th className="px-3 py-2 text-left">Genotype</th>
-                            <th className="px-3 py-2 text-left">Sex</th>
-                            <th className="px-3 py-2 text-left">Age</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {group.animals.map((animal, idx) => (
-                            <tr key={idx} className="border-t border-gray-100">
-                              <td className="px-3 py-2 font-mono">{animal.animal_id}</td>
-                              <td className="px-3 py-2">{animal.genotype}</td>
-                              <td className="px-3 py-2">{animal.sex}</td>
-                              <td className="px-3 py-2">{animal.age}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {pairs.length > 0 && (
-              <div className="space-y-4">
-                <div className="p-4 bg-indigo-50 rounded-lg">
-                  <h3 className="font-semibold text-indigo-900">
-                    Found {pairs.length} pairs, {unpaired.length} unpaired
-                  </h3>
-                </div>
-                {pairs.map((pair, idx) => (
-                  <div key={idx} className="border border-gray-200 rounded-lg p-4">
-                    <h3 className="font-bold text-lg text-indigo-600 mb-2">
-                      Pair {idx + 1} (Age diff: {pair.age_difference} days)
-                    </h3>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div className="bg-blue-50 p-3 rounded">
-                        <p className="font-semibold text-blue-900">♂ Male</p>
-                        <p>ID: {pair.male.animal_id}</p>
-                        <p>Genotype: {pair.male.genotype}</p>
-                        <p>Age: {pair.male.age} days</p>
-                      </div>
-                      <div className="bg-pink-50 p-3 rounded">
-                        <p className="font-semibold text-pink-900">♀ Female</p>
-                        <p>ID: {pair.female.animal_id}</p>
-                        <p>Genotype: {pair.female.genotype}</p>
-                        <p>Age: {pair.female.age} days</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-
-                {unpaired.length > 0 && (
-                  <div className="border border-amber-200 bg-amber-50 rounded-lg p-4">
-                    <h3 className="font-bold text-lg text-amber-900 mb-2">
-                      Unpaired Animals ({unpaired.length})
-                    </h3>
-                    <div className="grid grid-cols-2 gap-2 text-sm">
-                      {unpaired.map((animal, idx) => (
-                        <div key={idx} className="text-amber-800">
-                          {animal.animal_id} ({animal.sex}, {animal.age}d)
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {groups.length === 0 && pairs.length === 0 && (
-              <div className="text-center text-gray-400 py-12">
-                <p>Results will appear here after processing</p>
-              </div>
-            )}
+        <section className="ui-panel">
+          <div className="ui-row">
+            <h2 className="ui-h2">Results</h2>
+            {summary && <span className="ui-hint">{summary}</span>}
           </div>
-        </div>
+
+          {groups.length > 0 && (
+            <div className="ui-stack sm">
+              {groups.map((group) => (
+                <div key={group.group_number} className="ui-panel compact">
+                  <div className="ui-row">
+                    <div className="ui-label">
+                      {group.group_name || `Group ${group.group_number}`}
+                    </div>
+                    <span className="ui-hint">{group.count} animals</span>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="ui-table">
+                      <thead>
+                        <tr>
+                          <th>ID</th>
+                          <th>Genotype</th>
+                          <th>Sex</th>
+                          <th>Age</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {group.animals.map((animal, idx) => (
+                          <tr key={idx}>
+                            <td><code>{animal.animal_id}</code></td>
+                            <td>{animal.genotype}</td>
+                            <td>{animal.sex}</td>
+                            <td>{animal.age}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {pairs.length > 0 && (
+            <div className="ui-stack sm">
+              <div className="ui-alert">
+                <div>
+                  <strong>Pairs:</strong> {pairs.length} · <strong>Unpaired:</strong> {unpaired.length}
+                </div>
+              </div>
+
+              {pairs.map((pair, idx) => (
+                <div key={idx} className="ui-panel compact">
+                  <div className="ui-row">
+                    <div className="ui-label">Pair {idx + 1}</div>
+                    <span className="ui-hint">Age diff: {pair.age_difference} days</span>
+                  </div>
+                  <div className="grid gap-3 sm:grid-cols-2 text-sm">
+                    <div className="ui-panel compact">
+                      <div className="ui-label">Male</div>
+                      <div className="ui-hint"><code>{pair.male.animal_id}</code></div>
+                      <div className="ui-hint">{pair.male.genotype} · {pair.male.age} days</div>
+                    </div>
+                    <div className="ui-panel compact">
+                      <div className="ui-label">Female</div>
+                      <div className="ui-hint"><code>{pair.female.animal_id}</code></div>
+                      <div className="ui-hint">{pair.female.genotype} · {pair.female.age} days</div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {unpaired.length > 0 && (
+                <div className="ui-panel compact">
+                  <div className="ui-row">
+                    <div className="ui-label">Unpaired animals</div>
+                    <span className="ui-hint">{unpaired.length}</span>
+                  </div>
+                  <div className="grid gap-2 sm:grid-cols-2 text-sm">
+                    {unpaired.map((animal, idx) => (
+                      <div key={idx} className="ui-hint">
+                        <code>{animal.animal_id}</code> · {animal.sex} · {animal.age}d
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {groups.length === 0 && pairs.length === 0 && (
+            <div className="ui-panel compact text-center">
+              <p className="ui-hint">Results will appear here after processing.</p>
+            </div>
+          )}
+        </section>
       </div>
     </div>
   )
