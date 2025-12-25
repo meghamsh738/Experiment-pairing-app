@@ -46,11 +46,11 @@ Modern React + FastAPI app (see `modern-app/`). Legacy desktop (Python GUI) is d
 
 ## Screenshot
 
-Modern web app using the built-in example dataset and default grouping settings (captured Dec 1, 2025 via Playwright E2E):
+Modern web app using the built-in example dataset and default grouping settings (captured Dec 25, 2025 via Playwright E2E):
 
 ![Animal Pairing and Grouping Tool™ app screenshot](modern-app/screenshots/example_run.png)
 
-Recent verification (Dec 1, 2025):
+Recent verification (Dec 25, 2025):
 - `npm run test:e2e` (from `modern-app/`) starts the FastAPI backend on :8001 and Vite frontend on :5173, drives the example flow, and regenerates the screenshot above.
 
 ## Modern Web App (Preferred)
