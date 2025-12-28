@@ -1,6 +1,6 @@
 # Experiment Pairing App (React + FastAPI)
 
-Modernized web version of the Animal Pairing and Grouping desktop tool. Upload or paste animals, pick genotypes, name groups, distribute into balanced cohorts or pair by age, export to Excel, and demo everything with the built‑in example dataset.
+Modernized web version of the Animal Pairing and Grouping desktop tool. Upload or paste animals, pick genotypes, name groups, distribute into balanced cohorts or pair by age, export to Excel, and demo everything with the built-in example dataset. UI styling matches the lab notebook neo-brutalist system (refreshed Dec 28, 2025).
 
 ## Project structure
 - `src/` – React UI (Vite + TypeScript + Tailwind).
