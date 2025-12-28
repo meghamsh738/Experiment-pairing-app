@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test'
-import { promises as fs } from 'fs'
 
 test('example data flow renders results and exports state', async ({ page }) => {
   await page.goto('/')
+  await page.addStyleTag({ content: '* { transition: none !important; animation: none !important; }' })
 
   // Use bundled example data
   await page.getByLabel('Use Example Data').check()
@@ -17,6 +17,5 @@ test('example data flow renders results and exports state', async ({ page }) => 
   await expect(page.getByText('Pair 1')).toBeVisible()
 
   // Capture evidence screenshot
-  await fs.mkdir('screenshots', { recursive: true })
-  await page.screenshot({ path: 'screenshots/example_run.png', fullPage: true })
+  await expect(page).toHaveScreenshot('example_run.png', { fullPage: true })
 })
