@@ -1,5 +1,15 @@
 import { useEffect, useMemo, useState } from 'react'
+import {
+  CheckCircle2,
+  Download,
+  FlaskConical,
+  RefreshCw,
+  Shuffle,
+  Upload,
+  Users
+} from 'lucide-react'
 import exampleAnimals from '../example_data/animals.csv?raw'
+import './App.css'
 
 interface AnimalInput {
   animal_id: string
@@ -72,7 +82,7 @@ function App() {
   }, [useExampleData])
 
   useEffect(() => {
-    setGroupNames(Array.from({ length: numGroups }, (_, i) => groupNames[i] || `Group ${i + 1}`))
+    setGroupNames((prev) => Array.from({ length: numGroups }, (_, i) => prev[i] || `Group ${i + 1}`))
   }, [numGroups])
 
   useEffect(() => {
@@ -213,295 +223,354 @@ function App() {
   }
 
   const hasResults = groups.length > 0 || pairs.length > 0
+  const statusLabel = loading ? 'Processing' : 'Ready'
+  const statusClass = loading ? 'warning' : 'success'
+  const modeLabel = mode === 'distribute' ? 'Group mode' : 'Pair mode'
 
   return (
-    <div className="ui-container">
-      <div className="ui-stack">
-        <header className="ui-header">
-          <h1 className="ui-title">Experiment Pairing App</h1>
-          <p className="ui-subtitle">Upload or paste animals, select genotypes, distribute into groups or pair, and export.</p>
-        </header>
-
-        {error && (
-          <div className="ui-alert error">
-            <div>
-              <strong>Error:</strong> {error}
-            </div>
-            <button onClick={() => setError(null)} className="ui-btn ghost compact">Dismiss</button>
+    <div className="app-bg">
+      <header className="panel">
+        <div className="lab-head">
+          <div>
+            <p className="eyebrow">Experiment pairing</p>
+            <h2>Animal Pairing &amp; Grouping Tool</h2>
+            <p className="muted">Balance cohorts or breeding pairs with consistent ages and genotypes.</p>
           </div>
-        )}
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+            <span className={`status-chip ${statusClass}`}>{statusLabel}</span>
+            <span className="pill soft">{modeLabel}</span>
+            <span className="pill">
+              <FlaskConical className="icon" aria-hidden="true" />
+              Lab-ready export
+            </span>
+          </div>
+        </div>
+      </header>
 
-        <section className="ui-panel">
-          <div className="ui-stack sm">
-            <div className="ui-row">
-              <div className="ui-field">
-                <div className="ui-label">Mode</div>
-                <div className="ui-hint">Choose whether you want groups or breeding pairs.</div>
-              </div>
-              <div className="flex w-full gap-2 sm:w-auto">
-                <button
-                  onClick={() => setMode('distribute')}
-                  data-testid="mode-distribute"
-                  className={`ui-btn ${mode === 'distribute' ? 'primary' : 'secondary'} flex-1 sm:flex-none`}
-                >
-                  Distribute into Groups
-                </button>
-                <button
-                  onClick={() => setMode('pair')}
-                  data-testid="mode-pair"
-                  className={`ui-btn ${mode === 'pair' ? 'primary' : 'secondary'} flex-1 sm:flex-none`}
-                >
-                  Pair Animals
-                </button>
-              </div>
+      {error && (
+        <div className="panel" role="alert">
+          <div className="lab-head">
+            <div>
+              <p className="eyebrow">Alert</p>
+              <h2>Error</h2>
+              <p className="muted">{error}</p>
+            </div>
+            <button onClick={() => setError(null)} className="ghost">Dismiss</button>
+          </div>
+        </div>
+      )}
+
+      <div className="app-shell">
+        <aside className="panel sidebar">
+          <div className="lab-head">
+            <div>
+              <p className="eyebrow">Inputs</p>
+              <h2>Data Intake</h2>
+              <p className="muted">Upload a CSV/XLSX or paste rows with Animal_ID, Genotype, Sex, Age.</p>
+            </div>
+            <button className="pill soft" onClick={() => setUseExampleData(true)} type="button">
+              <RefreshCw className="icon" aria-hidden="true" />
+              Sample
+            </button>
+          </div>
+
+          <div className="sidebar-tabs" role="tablist" aria-label="Pairing mode">
+            <button
+              onClick={() => setMode('distribute')}
+              data-testid="mode-distribute"
+              className={`tab-button ${mode === 'distribute' ? 'active' : ''}`}
+              type="button"
+            >
+              <Users className="icon" aria-hidden="true" />
+              Groups
+            </button>
+            <button
+              onClick={() => setMode('pair')}
+              data-testid="mode-pair"
+              className={`tab-button ${mode === 'pair' ? 'active' : ''}`}
+              type="button"
+            >
+              <Shuffle className="icon" aria-hidden="true" />
+              Pairs
+            </button>
+          </div>
+
+          <div className="sidebar-section">
+            <div className="section-title">Data Source</div>
+            <p className="muted tiny">Paste rows or upload a file. This app normalizes into CSV.</p>
+            <div className="chip-row">
+              <label className="pill soft">
+                <input
+                  type="checkbox"
+                  checked={useExampleData}
+                  onChange={(e) => setUseExampleData(e.target.checked)}
+                />
+                <span>Use Example Data</span>
+              </label>
+              <button className="pill" onClick={() => setUseExampleData(true)} type="button">
+                <RefreshCw className="icon" aria-hidden="true" />
+                Reload Sample
+              </button>
+              <label className="ghost">
+                <Upload className="icon" aria-hidden="true" />
+                Upload File
+                <input
+                  type="file"
+                  accept=".csv,.xlsx,.xls"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0]
+                    if (file) handleUpload(file)
+                  }}
+                />
+              </label>
             </div>
 
-            <div className="ui-field">
-              <div className="ui-row">
-                <div>
-                  <div className="ui-label">Data Source</div>
-                  <div className="ui-hint">Upload CSV/XLSX or paste rows (Animal_ID, Genotype, Sex, Age).</div>
-                </div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <label className="flex items-center gap-2 text-sm">
-                    <input
-                      type="checkbox"
-                      checked={useExampleData}
-                      onChange={(e) => setUseExampleData(e.target.checked)}
-                    />
-                    <span>Use Example Data</span>
-                  </label>
-                  <button onClick={() => setUseExampleData(true)} className="ui-btn ghost compact">Reload Sample</button>
-                  <label className="ui-btn ghost compact">
-                    Upload File
-                    <input
-                      type="file"
-                      accept=".csv,.xlsx,.xls"
-                      className="hidden"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0]
-                        if (file) handleUpload(file)
-                      }}
-                    />
-                  </label>
-                </div>
-              </div>
-
+            <div className="field">
               <textarea
-                className="ui-textarea mono"
+                className="data-textarea"
                 placeholder="Animal_ID,Genotype,Sex,Age"
+                aria-label="Animal data CSV"
                 value={useExampleData ? EXAMPLE_DATA : animalText}
                 onChange={(e) => {
                   setUseExampleData(false)
                   setAnimalText(e.target.value)
                 }}
               />
-              <div className="ui-hint">
+              <p className="muted tiny">
                 Parsed animals: {filteredAnimals.length} · Genotypes: {genotypeOptions.join(', ') || 'None'}
-              </div>
+              </p>
             </div>
+          </div>
 
-            <div className="ui-panel compact">
-              <div className="ui-row">
-                <div>
-                  <div className="ui-label">Need to reformat your sheet?</div>
-                  <div className="ui-hint">Paste this prompt into ChatGPT, Gemini, or Grok; paste the returned CSV here.</div>
-                </div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <a href="https://chat.openai.com/" target="_blank" rel="noreferrer" className="ui-btn ghost compact">ChatGPT</a>
-                  <a href="https://gemini.google.com/app" target="_blank" rel="noreferrer" className="ui-btn ghost compact">Gemini</a>
-                  <a href="https://grok.com/" target="_blank" rel="noreferrer" className="ui-btn ghost compact">Grok</a>
-                </div>
+          <div className="sidebar-section">
+            <div className="field-row">
+              <div>
+                <div className="section-title">Genotypes</div>
+                <p className="muted tiny">Only selected genotypes are included in pairing/grouping.</p>
               </div>
-              <pre className="ui-codeblock">Convert to CSV with headers: Animal_ID, Genotype, Sex, Age. Normalize Sex to Male/Female, Age in weeks (number). If DOB exists, compute Age in weeks using today&apos;s date. Keep all rows, no invented data. Output CSV only.</pre>
-            </div>
-
-            <div className="ui-field">
-              <div className="ui-row">
-                <div>
-                  <div className="ui-label">Genotype Selection</div>
-                  <div className="ui-hint">Only selected genotypes are included in pairing/grouping.</div>
-                </div>
-                {genotypeOptions.length > 0 && (
-                  <button className="ui-btn ghost compact" onClick={() => setSelectedGenotypes(genotypeOptions)}>
-                    Select all
-                  </button>
-                )}
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {genotypeOptions.map(g => (
-                  <label key={g} className="ui-pill">
-                    <input
-                      type="checkbox"
-                      checked={selectedGenotypes.includes(g)}
-                      onChange={(e) => {
-                        setSelectedGenotypes(prev => e.target.checked ? [...prev, g] : prev.filter(x => x !== g))
-                      }}
-                    />
-                    {g}
-                  </label>
-                ))}
-                {genotypeOptions.length === 0 && <span className="ui-hint">No genotypes detected</span>}
-              </div>
-            </div>
-
-            <div className="grid gap-3 sm:grid-cols-2">
-              {mode === 'distribute' && (
-                <div className="ui-field">
-                  <div className="ui-label">Number of Groups</div>
-                  <input
-                    type="number"
-                    min="1"
-                    className="ui-input"
-                    value={numGroups}
-                    onChange={(e) => setNumGroups(parseInt(e.target.value) || 1)}
-                  />
-                  <div className="ui-field">
-                    <div className="ui-hint">Group names (optional)</div>
-                    <div className="grid gap-2">
-                      {groupNames.map((name, idx) => (
-                        <input
-                          key={idx}
-                          className="ui-input compact"
-                          value={name}
-                          onChange={(e) => {
-                            const copy = [...groupNames]
-                            copy[idx] = e.target.value
-                            setGroupNames(copy)
-                          }}
-                          placeholder={`Group ${idx + 1} name`}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                </div>
+              {genotypeOptions.length > 0 && (
+                <button className="pill soft" onClick={() => setSelectedGenotypes(genotypeOptions)} type="button">
+                  Select all
+                </button>
               )}
+            </div>
+            <div className="chip-row">
+              {genotypeOptions.map((g) => {
+                const active = selectedGenotypes.includes(g)
+                return (
+                  <button
+                    key={g}
+                    type="button"
+                    className={`pill ${active ? 'active-pill' : ''}`}
+                    onClick={() => {
+                      setSelectedGenotypes((prev) => (active ? prev.filter((x) => x !== g) : [...prev, g]))
+                    }}
+                  >
+                    {active && <CheckCircle2 className="icon" aria-hidden="true" />}
+                    {g}
+                  </button>
+                )
+              })}
+              {genotypeOptions.length === 0 && <span className="muted tiny">No genotypes detected</span>}
+            </div>
+          </div>
 
-              <div className="ui-field">
-                <div className="ui-label">Age Leeway (days)</div>
+          <div className="sidebar-section">
+            <div className="section-title">Settings</div>
+            <div className="template-row">
+              <label className="field">
+                <span className="eyebrow">Age Leeway (days)</span>
                 <input
                   type="number"
                   min="0"
-                  className="ui-input"
                   value={ageLeeway}
                   onChange={(e) => setAgeLeeway(parseInt(e.target.value) || 0)}
                 />
-              </div>
+              </label>
+              {mode === 'distribute' && (
+                <label className="field">
+                  <span className="eyebrow">Number of Groups</span>
+                  <input
+                    type="number"
+                    min="1"
+                    value={numGroups}
+                    onChange={(e) => setNumGroups(parseInt(e.target.value) || 1)}
+                  />
+                </label>
+              )}
             </div>
 
-            <div className="grid gap-2">
+            {mode === 'distribute' && (
+              <div className="field">
+                <span className="muted tiny">Group names (optional)</span>
+                <div className="template-row">
+                  {groupNames.map((name, idx) => (
+                    <input
+                      key={idx}
+                      value={name}
+                      aria-label={`Group ${idx + 1} name`}
+                      onChange={(e) => {
+                        const copy = [...groupNames]
+                        copy[idx] = e.target.value
+                        setGroupNames(copy)
+                      }}
+                      placeholder={`Group ${idx + 1} name`}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="sidebar-section">
+            <div className="section-title">Actions</div>
+            <div className="edit-actions">
               <button
                 onClick={mode === 'distribute' ? handleDistribute : handlePair}
                 disabled={loading}
                 data-testid="process-btn"
-                className="ui-btn primary w-full"
+                className="accent"
+                type="button"
               >
                 {loading ? 'Processing…' : mode === 'distribute' ? 'Distribute Animals' : 'Pair Animals'}
               </button>
               {hasResults && (
-                <button onClick={handleExport} className="ui-btn secondary w-full">
+                <button onClick={handleExport} className="ghost" type="button">
+                  <Download className="icon" aria-hidden="true" />
                   Export to Excel
                 </button>
               )}
             </div>
           </div>
-        </section>
 
-        <section className="ui-panel">
-          <div className="ui-row">
-            <h2 className="ui-h2">Results</h2>
-            {summary && <span className="ui-hint">{summary}</span>}
+          <div className="sidebar-section">
+            <div className="section-title">Sheet Helper</div>
+            <div className="link-panel">
+              <div className="field">
+                <span className="muted tiny">Paste this prompt into ChatGPT, Gemini, or Grok, then paste the CSV here.</span>
+              </div>
+              <div className="edit-actions">
+                <a href="https://chat.openai.com/" target="_blank" rel="noreferrer" className="pill soft">ChatGPT</a>
+                <a href="https://gemini.google.com/app" target="_blank" rel="noreferrer" className="pill soft">Gemini</a>
+                <a href="https://grok.com/" target="_blank" rel="noreferrer" className="pill soft">Grok</a>
+              </div>
+              <pre className="data-textarea" aria-label="Formatting prompt">
+                Convert to CSV with headers: Animal_ID, Genotype, Sex, Age. Normalize Sex to Male/Female, Age in weeks (number). If DOB exists, compute Age in weeks using today&apos;s date. Keep all rows, no invented data. Output CSV only.
+              </pre>
+            </div>
+          </div>
+        </aside>
+
+        <section className="panel editor">
+          <div className="editor-header">
+            <div className="title-row">
+              <h1>Results</h1>
+              <span className={`status-chip ${hasResults ? 'success' : 'warning'}`}>
+                {hasResults ? 'Ready' : 'Waiting'}
+              </span>
+            </div>
+            <div className="chip-row">
+              {summary && <span className="pill soft">{summary}</span>}
+              {groups.length > 0 && <span className="pill">Groups: {groups.length}</span>}
+              {pairs.length > 0 && <span className="pill">Pairs: {pairs.length}</span>}
+            </div>
           </div>
 
-          {groups.length > 0 && (
-            <div className="ui-stack sm">
-              {groups.map((group) => (
-                <div key={group.group_number} className="ui-panel compact">
-                  <div className="ui-row">
-                    <div className="ui-label">
-                      {group.group_name || `Group ${group.group_number}`}
-                    </div>
-                    <span className="ui-hint">{group.count} animals</span>
-                  </div>
-                  <div className="overflow-x-auto">
-                    <table className="ui-table">
-                      <thead>
-                        <tr>
-                          <th>ID</th>
-                          <th>Genotype</th>
-                          <th>Sex</th>
-                          <th>Age</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {group.animals.map((animal, idx) => (
-                          <tr key={idx}>
-                            <td><code>{animal.animal_id}</code></td>
-                            <td>{animal.genotype}</td>
-                            <td>{animal.sex}</td>
-                            <td>{animal.age}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {pairs.length > 0 && (
-            <div className="ui-stack sm">
-              <div className="ui-alert">
-                <div>
-                  <strong>Pairs:</strong> {pairs.length} · <strong>Unpaired:</strong> {unpaired.length}
-                </div>
-              </div>
-
-              {pairs.map((pair, idx) => (
-                <div key={idx} className="ui-panel compact">
-                  <div className="ui-row">
-                    <div className="ui-label">Pair {idx + 1}</div>
-                    <span className="ui-hint">Age diff: {pair.age_difference} days</span>
-                  </div>
-                  <div className="grid gap-3 sm:grid-cols-2 text-sm">
-                    <div className="ui-panel compact">
-                      <div className="ui-label">Male</div>
-                      <div className="ui-hint"><code>{pair.male.animal_id}</code></div>
-                      <div className="ui-hint">{pair.male.genotype} · {pair.male.age} days</div>
-                    </div>
-                    <div className="ui-panel compact">
-                      <div className="ui-label">Female</div>
-                      <div className="ui-hint"><code>{pair.female.animal_id}</code></div>
-                      <div className="ui-hint">{pair.female.genotype} · {pair.female.age} days</div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-
-              {unpaired.length > 0 && (
-                <div className="ui-panel compact">
-                  <div className="ui-row">
-                    <div className="ui-label">Unpaired animals</div>
-                    <span className="ui-hint">{unpaired.length}</span>
-                  </div>
-                  <div className="grid gap-2 sm:grid-cols-2 text-sm">
-                    {unpaired.map((animal, idx) => (
-                      <div key={idx} className="ui-hint">
-                        <code>{animal.animal_id}</code> · {animal.sex} · {animal.age}d
+          <div className="editor-body">
+            {groups.length > 0 && (
+              <div className="results-grid">
+                {groups.map((group) => (
+                  <div key={group.group_number} className="today-card">
+                    <div className="today-head">
+                      <div>
+                        <h2>{group.group_name || `Group ${group.group_number}`}</h2>
+                        <p className="muted tiny">{group.count} animals</p>
                       </div>
-                    ))}
+                      <span className="pill soft">Balanced cohort</span>
+                    </div>
+                    <div className="table-wrap">
+                      <table>
+                        <thead>
+                          <tr>
+                            <th>ID</th>
+                            <th>Genotype</th>
+                            <th>Sex</th>
+                            <th>Age (days)</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {group.animals.map((animal, idx) => (
+                            <tr key={idx}>
+                              <td><code>{animal.animal_id}</code></td>
+                              <td>{animal.genotype}</td>
+                              <td>{animal.sex}</td>
+                              <td>{animal.age}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
-                </div>
-              )}
-            </div>
-          )}
+                ))}
+              </div>
+            )}
 
-          {groups.length === 0 && pairs.length === 0 && (
-            <div className="ui-panel compact text-center">
-              <p className="ui-hint">Results will appear here after processing.</p>
-            </div>
-          )}
+            {pairs.length > 0 && (
+              <div className="results-grid">
+                <div className="status-chip success">Pairs: {pairs.length} · Unpaired: {unpaired.length}</div>
+
+                {pairs.map((pair, idx) => (
+                  <div key={idx} className="today-card">
+                    <div className="today-head">
+                      <div>
+                        <h2>Pair {idx + 1}</h2>
+                        <p className="muted tiny">Age difference: {pair.age_difference} days</p>
+                      </div>
+                      <span className="pill soft">Breeding ready</span>
+                    </div>
+                    <div className="template-row">
+                      <div className="template-card active">
+                        <p className="eyebrow">Male</p>
+                        <p className="muted"><code>{pair.male.animal_id}</code></p>
+                        <p className="muted tiny">{pair.male.genotype} · {pair.male.age} days</p>
+                      </div>
+                      <div className="template-card active">
+                        <p className="eyebrow">Female</p>
+                        <p className="muted"><code>{pair.female.animal_id}</code></p>
+                        <p className="muted tiny">{pair.female.genotype} · {pair.female.age} days</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                {unpaired.length > 0 && (
+                  <div className="today-card">
+                    <div className="today-head">
+                      <div>
+                        <h2>Unpaired</h2>
+                        <p className="muted tiny">{unpaired.length} animals</p>
+                      </div>
+                      <span className="pill ghost-pill">Needs matching</span>
+                    </div>
+                    <div className="chip-row">
+                      {unpaired.map((animal, idx) => (
+                        <span key={idx} className="pill soft">
+                          <code>{animal.animal_id}</code> · {animal.sex} · {animal.age}d
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {groups.length === 0 && pairs.length === 0 && (
+              <div className="empty">
+                <p className="muted">Results will appear here after processing.</p>
+              </div>
+            )}
+          </div>
         </section>
       </div>
     </div>
