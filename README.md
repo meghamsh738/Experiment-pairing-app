@@ -238,7 +238,7 @@ Please ensure that your contributions adhere to the project's coding standards a
 For any questions, suggestions, or support, please contact:
 
 - **Developer**: Meghamsh Teja Konda
-- **Email**: [meghamshteja555@gmail.com](mailto:meghamshteja555@gmail.com)
+- **Email**: [lab-support@example.org](mailto:lab-support@example.org)
 
 ---
 
