@@ -20,8 +20,10 @@ app = FastAPI(title="Experiment Pairing API")
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:5174"],
-    allow_credentials=True,
+    # The suite loads front-ends from file:// inside Electron. Allow all origins so
+    # local module windows can talk to the bundled FastAPI backend.
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )

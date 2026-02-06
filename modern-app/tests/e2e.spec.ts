@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test'
 
 test('example data flow renders results and exports state', async ({ page }) => {
   await page.goto('/')
-  await page.addStyleTag({ content: '* { transition: none !important; animation: none !important; }' })
+  await page.addStyleTag({ content: '* { transition: none !important; animation: none !important; } .signature { display: none !important; }' })
 
   // Use bundled example data
   await page.getByLabel('Use Example Data').check()

@@ -6,6 +6,8 @@
 
 Modern React + FastAPI app (see `modern-app/`). Legacy desktop (Python GUI) is documented in `LEGACY.md`.
 
+Part of **Easylab Suite**: when bundled, it launches from the suite desktop launcher as the **Animal Pairing** module.
+
 ## Table of Contents
 - [Overview](#overview)
 - [Features](#features)
@@ -229,16 +231,16 @@ Please ensure that your contributions adhere to the project's coding standards a
 
 ## License
 
-© 2024 Meghamsh Teja Konda. All rights reserved.
+Copyright (c) 2026 Meghamsh Teja Konda. All Rights Reserved.
 
-*This project is licensed under the [MIT License](LICENSE).*
+This project is proprietary. See `LICENSE`.
 
 ## Contact
 
 For any questions, suggestions, or support, please contact:
 
 - **Developer**: Meghamsh Teja Konda
-- **Email**: [lab-support@example.org](mailto:lab-support@example.org)
+- **Email**: [meghamshteja555@gmail.com](mailto:meghamshteja555@gmail.com)
 
 ---
 

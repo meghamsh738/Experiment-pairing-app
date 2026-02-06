@@ -32,6 +32,15 @@ interface Pair {
 }
 
 const EXAMPLE_DATA = exampleAnimals.trim()
+const resolveApiBase = () => {
+  if (typeof window === 'undefined') return undefined
+  const params = new URLSearchParams(window.location.search)
+  const queryBase = params.get('apiBase') ?? undefined
+  const injected = (window as Window & { __EASYLAB_API__?: string }).__EASYLAB_API__
+  return injected ?? queryBase
+}
+
+const API_BASE = resolveApiBase() ?? import.meta.env.VITE_API_BASE ?? 'http://127.0.0.1:8001'
 
 const parseTextAnimals = (text: string): AnimalInput[] => {
   const lines = text.trim().split('\n').filter(l => l.trim())
@@ -102,7 +111,7 @@ function App() {
     try {
       const formData = new FormData()
       formData.append('file', file)
-      const response = await fetch('http://localhost:8001/upload', { method: 'POST', body: formData })
+      const response = await fetch(`${API_BASE}/upload`, { method: 'POST', body: formData })
       if (!response.ok) throw new Error('Upload failed')
       const data = await response.json()
       const csvText = ['Animal_ID,Genotype,Sex,Age', ...data.animals.map((a: AnimalInput) => `${a.animal_id},${a.genotype},${a.sex},${a.age}`)].join('\n')
@@ -124,7 +133,7 @@ function App() {
     setLoading(true)
     setError(null)
     try {
-      const response = await fetch('http://localhost:8001/distribute', {
+      const response = await fetch(`${API_BASE}/distribute`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -157,7 +166,7 @@ function App() {
     setLoading(true)
     setError(null)
     try {
-      const response = await fetch('http://localhost:8001/pair', {
+      const response = await fetch(`${API_BASE}/pair`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -202,7 +211,7 @@ function App() {
           selected_genotypes: selectedGenotypes,
           use_example: useExampleData
         }
-      const response = await fetch(`http://localhost:8001${endpoint}`, {
+      const response = await fetch(`${API_BASE}${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
@@ -573,6 +582,14 @@ function App() {
           </div>
         </section>
       </div>
+
+      <footer className="signature" data-testid="signature">
+        <span className="sig-primary">Made by Meghamsh Teja Konda</span>
+        <span className="sig-dot" aria-hidden="true" />
+        <a className="sig-link" href="mailto:meghamshteja555@gmail.com">
+          meghamshteja555@gmail.com
+        </a>
+      </footer>
     </div>
   )
 }
