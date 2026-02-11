@@ -8,6 +8,7 @@ import {
   Upload,
   Users
 } from 'lucide-react'
+import { GuidedTutorial, type TutorialStep } from './GuidedTutorial'
 import exampleAnimals from '../example_data/animals.csv?raw'
 import './App.css'
 
@@ -104,6 +105,37 @@ function App() {
     if (!selectedGenotypes.length) return animals
     return animals.filter(a => selectedGenotypes.includes(a.genotype))
   }, [animals, selectedGenotypes])
+
+  const tutorialSteps: TutorialStep[] = useMemo(
+    () => [
+      {
+        selector: '[data-testid="animal-data-input"]',
+        title: 'Load animal rows',
+        description: 'Paste or upload animal rows before running grouping or pairing.',
+      },
+      {
+        selector: '[data-testid="mode-distribute"]',
+        title: 'Pick workflow mode',
+        description: 'Choose Groups for balanced cohorts or Pairs for male/female matching.',
+      },
+      {
+        selector: '[data-testid="process-btn"]',
+        title: 'Process animals',
+        description: 'Run the selected workflow after setting genotype filters and age leeway.',
+      },
+      {
+        selector: '[data-testid="pairing-export-btn"]',
+        title: 'Export final workbook',
+        description: 'Export grouped or paired results to Excel once the output looks correct.',
+      },
+      {
+        selector: '[data-testid="pairing-results-panel"]',
+        title: 'Review results',
+        description: 'Confirm cohorts/pairs and unpaired animals in the results panel.',
+      },
+    ],
+    []
+  )
 
   const handleUpload = async (file: File) => {
     setLoading(true)
@@ -340,6 +372,7 @@ function App() {
                 className="data-textarea"
                 placeholder="Animal_ID,Genotype,Sex,Age"
                 aria-label="Animal data CSV"
+                data-testid="animal-data-input"
                 value={useExampleData ? EXAMPLE_DATA : animalText}
                 onChange={(e) => {
                   setUseExampleData(false)
@@ -435,6 +468,10 @@ function App() {
           <div className="sidebar-section">
             <div className="section-title">Actions</div>
             <div className="edit-actions">
+              <GuidedTutorial
+                steps={tutorialSteps}
+                startLabel="Tutorial"
+              />
               <button
                 onClick={mode === 'distribute' ? handleDistribute : handlePair}
                 disabled={loading}
@@ -445,7 +482,7 @@ function App() {
                 {loading ? 'Processing…' : mode === 'distribute' ? 'Distribute Animals' : 'Pair Animals'}
               </button>
               {hasResults && (
-                <button onClick={handleExport} className="ghost" type="button">
+                <button onClick={handleExport} className="ghost" type="button" data-testid="pairing-export-btn">
                   <Download className="icon" aria-hidden="true" />
                   Export to Excel
                 </button>
@@ -471,7 +508,7 @@ function App() {
           </div>
         </aside>
 
-        <section className="panel editor">
+        <section className="panel editor" data-testid="pairing-results-panel">
           <div className="editor-header">
             <div className="title-row">
               <h1>Results</h1>
