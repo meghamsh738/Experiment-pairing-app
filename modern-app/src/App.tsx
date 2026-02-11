@@ -109,29 +109,64 @@ function App() {
   const tutorialSteps: TutorialStep[] = useMemo(
     () => [
       {
+        selector: '[data-testid="pairing-use-example-toggle"]',
+        title: 'Use example data toggle',
+        description: 'Enable this to populate the bundled demonstration dataset.',
+        details: [
+          'Use this for first-run validation before loading real cohort data.',
+        ],
+      },
+      {
         selector: '[data-testid="animal-data-input"]',
-        title: 'Load animal rows',
-        description: 'Paste or upload animal rows before running grouping or pairing.',
+        title: 'Paste or upload animal rows',
+        description: 'Input rows should include Animal_ID, Genotype, Sex, and Age.',
+        details: [
+          'Upload supports CSV/XLSX files.',
+          'Textarea supports direct paste from spreadsheets.',
+        ],
       },
       {
         selector: '[data-testid="mode-distribute"]',
-        title: 'Pick workflow mode',
-        description: 'Choose Groups for balanced cohorts or Pairs for male/female matching.',
+        title: 'Groups mode',
+        description: 'Use when you want balanced experimental cohorts.',
+      },
+      {
+        selector: '[data-testid="mode-pair"]',
+        title: 'Pairs mode',
+        description: 'Use when you need male/female pairing output instead of multi-group distribution.',
+      },
+      {
+        selector: '[data-testid="genotype-filter-section"]',
+        title: 'Genotype filtering',
+        description: 'Select which genotypes are included in processing.',
+        details: [
+          'Only selected genotype tags are considered for groups/pairs.',
+        ],
+      },
+      {
+        selector: '[data-testid="age-leeway-input"]',
+        title: 'Age leeway',
+        description: 'Defines maximum allowed age difference for balancing and pairing.',
+      },
+      {
+        selector: '[data-testid="num-groups-input"]',
+        title: 'Number of groups (Groups mode)',
+        description: 'Controls how many output cohorts are generated in distribute mode.',
       },
       {
         selector: '[data-testid="process-btn"]',
-        title: 'Process animals',
-        description: 'Run the selected workflow after setting genotype filters and age leeway.',
+        title: 'Run processing',
+        description: 'Execute current mode with selected filters and settings.',
       },
       {
         selector: '[data-testid="pairing-export-btn"]',
-        title: 'Export final workbook',
-        description: 'Export grouped or paired results to Excel once the output looks correct.',
+        title: 'Export Excel',
+        description: 'Download grouped/pairing output after reviewing results.',
       },
       {
         selector: '[data-testid="pairing-results-panel"]',
-        title: 'Review results',
-        description: 'Confirm cohorts/pairs and unpaired animals in the results panel.',
+        title: 'Review results (final step)',
+        description: 'Validate cohorts/pairs and unpaired animals before final handoff.',
       },
     ],
     []
@@ -345,6 +380,7 @@ function App() {
                   type="checkbox"
                   checked={useExampleData}
                   onChange={(e) => setUseExampleData(e.target.checked)}
+                  data-testid="pairing-use-example-toggle"
                 />
                 <span>Use Example Data</span>
               </label>
@@ -397,7 +433,7 @@ function App() {
                 </button>
               )}
             </div>
-            <div className="chip-row">
+            <div className="chip-row" data-testid="genotype-filter-section">
               {genotypeOptions.map((g) => {
                 const active = selectedGenotypes.includes(g)
                 return (
@@ -428,6 +464,7 @@ function App() {
                   min="0"
                   value={ageLeeway}
                   onChange={(e) => setAgeLeeway(parseInt(e.target.value) || 0)}
+                  data-testid="age-leeway-input"
                 />
               </label>
               {mode === 'distribute' && (
@@ -438,6 +475,7 @@ function App() {
                     min="1"
                     value={numGroups}
                     onChange={(e) => setNumGroups(parseInt(e.target.value) || 1)}
+                    data-testid="num-groups-input"
                   />
                 </label>
               )}
