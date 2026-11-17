@@ -10,20 +10,29 @@ export default defineConfig({
     toHaveScreenshot: { animations: 'disabled', caret: 'hide' }
   },
   use: {
-    baseURL: 'http://localhost:5173',
+    baseURL: 'http://127.0.0.1:19521',
     trace: 'on-first-retry',
     viewport: { width: 1440, height: 900 },
     colorScheme: 'light',
     reducedMotion: 'reduce',
     video: 'retain-on-failure'
   },
-  webServer: {
-    command: "bash -lc 'set -e; trap \"kill 0\" EXIT; npm run dev:back & npm run dev:front'",
-    url: 'http://localhost:5173',
-    reuseExistingServer: true,
-    timeout: 120_000,
-    stdout: 'ignore'
-  },
+  webServer: [
+    {
+      command: 'npm run dev:back',
+      url: 'http://127.0.0.1:18521/health',
+      reuseExistingServer: false,
+      timeout: 120_000,
+      stdout: 'ignore'
+    },
+    {
+      command: 'npm run dev:front',
+      url: 'http://127.0.0.1:19521',
+      reuseExistingServer: false,
+      timeout: 120_000,
+      stdout: 'ignore'
+    }
+  ],
   projects: [
     {
       name: 'chromium',

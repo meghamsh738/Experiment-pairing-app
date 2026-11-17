@@ -5,14 +5,16 @@ Handles animal distribution and pairing logic.
 """
 
 import io
+import re
 from pathlib import Path
-from typing import List, Dict, Optional, Tuple
+from typing import List, Dict, Optional, Tuple, Literal, Any, Union
 
 import pandas as pd
 from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, StrictFloat, StrictInt
+from backend.allocation import AllocationValidationError, allocate_animals, create_export_workbook
 
 
 app = FastAPI(title="Experiment Pairing API")
@@ -56,9 +58,75 @@ class PairRequest(BaseModel):
     use_example: bool = False
 
 
+class AllocationAnimal(BaseModel):
+    animal_id: str
+    genotype: str
+    sex: str
+    age: Union[StrictInt, StrictFloat]
+
+    class Config:
+        extra = "allow"
+
+
+class LockedAssignment(BaseModel):
+    animal_id: str
+    group_number: StrictInt
+
+
+class AnimalPairRule(BaseModel):
+    animal_id_a: str
+    animal_id_b: str
+
+
+class AllocationRequest(BaseModel):
+    animals: List[AllocationAnimal]
+    selected_sexes: List[str]
+    selected_genotypes: List[str]
+    group_sizes: List[StrictInt]
+    group_names: List[str]
+    method: Literal["simple_random", "balanced"]
+    seed: StrictInt
+    age_unit: Literal["days", "weeks", "months", "years"]
+    balance_priorities: List[Literal["sex", "genotype", "age"]] = Field(default_factory=list)
+    locks: List[LockedAssignment] = Field(default_factory=list)
+    together: List[AnimalPairRule] = Field(default_factory=list)
+    apart: List[AnimalPairRule] = Field(default_factory=list)
+
+
+class AllocationExportRequest(BaseModel):
+    input_animals: List[AllocationAnimal]
+    allocation: Dict[str, Any]
+    run_name: str = "Animal allocation"
+
+
 # ==================== CORE LOGIC ====================
 ROOT_DIR = Path(__file__).resolve().parent.parent
 EXAMPLE_ANIMALS_PATH = ROOT_DIR / "example_data" / "animals.csv"
+
+
+def normalize_upload_columns(df: pd.DataFrame) -> pd.DataFrame:
+    """Keep source headers while checking required columns by their meaning."""
+    def normalized(value: str) -> str:
+        return re.sub(r"[^a-z0-9]", "", str(value).lower())
+
+    source_headers = [str(column).strip() for column in df.columns]
+    compact_headers = [normalized(column) for column in source_headers]
+    aliases = {
+        "animal_id": {"animalid", "animalidno", "animalidentifier", "id", "idno"},
+        "genotype": {"genotype", "genotypeclass"},
+        "sex": {"sex", "gender"},
+    }
+    columns = {name: next((index for index, header in enumerate(compact_headers) if header in options), None)
+               for name, options in aliases.items()}
+    columns["age"] = next((index for index, header in enumerate(compact_headers)
+                           if header.startswith("age") and header not in {"ageunit", "ageunits", "unitofage"}), None)
+    missing = [name for name, index in columns.items() if index is None]
+    if missing:
+        raise HTTPException(status_code=400, detail=f"Missing required columns: {missing}")
+
+    df = df.copy()
+    df.columns = [re.sub(r"\s+", "_", name.strip().lower()) for name in source_headers]
+    return df.astype(object).where(pd.notna(df), None)
 
 
 def load_example_animals() -> pd.DataFrame:
@@ -170,6 +238,45 @@ def pair_animals(animals_df: pd.DataFrame, age_leeway: int) -> List[Tuple[pd.Ser
 
 
 # ==================== API ENDPOINTS ====================
+
+@app.post("/allocate")
+async def allocate_endpoint(request: AllocationRequest):
+    """Generate a deterministic, reviewable allocation for the guided workflow."""
+    try:
+        return allocate_animals(
+            animals=[animal.dict() for animal in request.animals],
+            group_sizes=request.group_sizes,
+            group_names=request.group_names,
+            method=request.method,
+            seed=request.seed,
+            age_unit=request.age_unit,
+            selected_sexes=request.selected_sexes,
+            selected_genotypes=request.selected_genotypes,
+            balance_priorities=request.balance_priorities,
+            locks=[lock.dict() for lock in request.locks],
+            together=[rule.dict() for rule in request.together],
+            apart=[rule.dict() for rule in request.apart],
+        )
+    except AllocationValidationError as error:
+        raise HTTPException(status_code=422, detail=str(error)) from error
+
+
+@app.post("/export-allocation")
+async def export_allocation_endpoint(request: AllocationExportRequest):
+    """Export the exact reviewed allocation without rerunning the algorithm."""
+    try:
+        workbook = create_export_workbook(
+            input_animals=[animal.dict() for animal in request.input_animals],
+            allocation=request.allocation,
+            run_name=request.run_name,
+        )
+    except AllocationValidationError as error:
+        raise HTTPException(status_code=422, detail=str(error)) from error
+    return StreamingResponse(
+        io.BytesIO(workbook),
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": "attachment; filename=animal_allocation.xlsx"},
+    )
 
 @app.post("/distribute")
 async def distribute_endpoint(request: DistributeRequest):
@@ -347,19 +454,10 @@ async def upload_endpoint(file: UploadFile = File(...)):
         else:
             df = pd.read_csv(buffer)
 
-        df.columns = [c.strip().lower().replace(" ", "_") for c in df.columns]
-        col_map = {
-            "animal_id": "animal_id",
-            "genotype": "genotype",
-            "sex": "sex",
-            "age": "age"
-        }
-        missing = [k for k in ["animal_id", "genotype", "sex", "age"] if k not in df.columns]
-        if missing:
-            raise HTTPException(status_code=400, detail=f"Missing required columns: {missing}")
-        df = df.rename(columns=col_map)
+        df = normalize_upload_columns(df)
         animals = df.to_dict('records')
-        genotypes = sorted(df['genotype'].dropna().unique().tolist())
+        genotype_column = next(column for column in df.columns if re.sub(r"[^a-z0-9]", "", column) in {"genotype", "genotypeclass"})
+        genotypes = sorted({str(value) for value in df[genotype_column].dropna().tolist()})
         return {"animals": animals, "genotypes": genotypes}
     except HTTPException:
         raise

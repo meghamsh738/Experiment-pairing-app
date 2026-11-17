@@ -9,6 +9,19 @@ const DIST_DIR = process.env.APP_DIST_DIR ?? path.join(ROOT_DIR, '.app-dist', 'w
 export default defineConfig({
   plugins: [react()],
   base: './',
+  define: {
+    'import.meta.env.VITE_API_BASE': JSON.stringify(process.env.VITE_API_BASE || 'http://127.0.0.1:18521'),
+  },
+  server: {
+    host: '127.0.0.1',
+    port: 19521,
+    strictPort: true,
+  },
+  preview: {
+    host: '127.0.0.1',
+    port: 19521,
+    strictPort: true,
+  },
   build: {
     outDir: DIST_DIR,
     emptyOutDir: true,

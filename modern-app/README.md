@@ -20,25 +20,23 @@ License: All Rights Reserved. See `../LICENSE`.
 
 ## Setup
 ```bash
-# Install frontend deps (includes Playwright)
-npm install
+# Install the lockfile-pinned frontend dependencies
+npm ci
 
-# Install backend deps
-pip install -r backend/requirements.txt
+# Create this module's isolated Python environment from the EasyLab Next root
+python3.11 -m venv ../../../runtime/python-envs/animal-pairing
+../../../runtime/python-envs/animal-pairing/bin/python -m pip install -r backend/requirements.txt
 ```
 
 ## Run (dev)
 ```bash
-# Start FastAPI (auto-reload) on :8001
-npm run dev:back
-
-# In another shell: start Vite dev server on :5173
-npm run dev:front
+# Start the API and frontend on strict loopback ports 18521 and 19521
+EASYLAB_PYTHON="$PWD/../../../runtime/python-envs/animal-pairing/bin/python" npm run dev:full
 ```
-Open http://localhost:5173 and toggle **Use Example Data** (or upload CSV/XLSX) to preload the sample animals.
+Open http://127.0.0.1:19521 and toggle **Use Example Data** (or upload CSV/XLSX) to preload the sample animals. The API launcher creates separate Animal Pairing runtime directories under `runtime/animal-pairing/` and refuses to start if port 18521 is already occupied.
 
 ## Data format & quick AI helper
-- Required columns (CSV/XLSX): `Animal_ID, Genotype, Sex, Age` (see `example_data/animals.csv`).
+- Required columns (CSV/XLSX): `Animal_ID, Genotype, Sex, Age` (see `example_data/animals.csv`). Age may include a unit in its header (such as `Age (weeks)`) or in an `Age Unit` column; the selected allocation unit must match and values are never silently converted.
 - If your sheet has different headers/order, ask an AI to reshape it first. Handy links: [ChatGPT](https://chat.openai.com/), [Gemini](https://gemini.google.com/app), [Grok](https://grok.com/).
 - Prompt to paste into any of them:
   - "Convert my table to CSV with headers: Animal_ID,Genotype,Sex,Age. Keep rows as-is, don’t invent data, output UTF-8 CSV text only."
@@ -46,10 +44,7 @@ Open http://localhost:5173 and toggle **Use Example Data** (or upload CSV/XLSX) 
 
 ## Tests and screenshot
 ```bash
-# Install browsers once
-npx playwright install --with-deps chromium
-
-# Start both servers and run E2E (saves screenshots/example_run.png)
+# Start the isolated servers and run the browser checks
 npm run test:e2e
 ```
 
@@ -59,6 +54,8 @@ npm run test:e2e
 - `POST /pair` – Body: animals[], age_leeway, selected_genotypes?, use_example?
 - `POST /export-distribute` – Same as distribute, returns Excel workbook.
 - `POST /export-pairs` – Same as pair, returns Excel workbook.
+- `POST /allocate` – Seeded simple-random or balanced allocation with explicit capacities, age units, locks, and together/apart rules.
+- `POST /export-allocation` – Exports the exact reviewed allocation after checking its animal records, group sizes, selection, and hard rules.
 - `GET /health` – Liveness check.
 
-All endpoints accept `use_example: true` to operate on `example_data/animals.csv`, ensuring the app runs without user files.
+The app keeps a separate local workspace in this device's browser profile. Use **Reset saved work** to clear it. The bundled example dataset supports first-run checks without using research data.
